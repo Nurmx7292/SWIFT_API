@@ -84,8 +84,10 @@ export const getSwiftCodesByCountry = async (req: Request, res: Response): Promi
   };
 
   export const createSwiftCode = async (req: Request, res: Response): Promise<any> => {
+    req.body.isHeadquarter = req.body.isHeadquarter === true || req.body.isHeadquarter === 'true';
     const { address, bankName, countryISO2, countryName, isHeadquarter, swiftCode } = req.body;
-  
+    
+    // Check if all required fields are provided
     if (!address || !bankName || !countryISO2 || !countryName || typeof isHeadquarter !== 'boolean' || !swiftCode) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
