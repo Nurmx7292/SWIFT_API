@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 
 async function main() {
-  const dataDir = path.join(__dirname, '../../data');
+  const dataDir = path.resolve(process.cwd(), 'data');
   const files = fs.readdirSync(dataDir).filter(f => f.endsWith('.xlsx'));
   if (files.length === 0) {
     console.error('No Excel (.xlsx) file found in data/ directory.');

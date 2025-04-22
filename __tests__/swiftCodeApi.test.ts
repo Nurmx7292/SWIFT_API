@@ -13,9 +13,9 @@ beforeAll(async () => {
 
   await prisma.swiftCode.create({
     data: {
-      swiftCode: 'BPKOPLPWXXX',
-      bankName: 'PKO BANK POLSKI',
-      address: 'UL. PUŁAWSKA 15, 02-515 WARSZAWA',
+      swiftCode: 'PLTEST00XXX',
+      bankName: 'TEST BANK POLAND',
+      address: 'UL. TESTOWA 1, 00-000 WARSZAWA',
       isHeadquarter: true,
       countryIso2: 'PL',
     },
@@ -26,8 +26,9 @@ beforeAll(async () => {
 // Clean up test data after all tests
 afterAll(async () => {
   console.log('Cleaning up test data...');
-  await prisma.swiftCode.deleteMany({});
-  await prisma.country.deleteMany({});
+  await prisma.swiftCode.deleteMany({
+    where: { swiftCode: { in: ['PLTEST00XXX', 'PLTEST00001'] } }
+  });
   await prisma.$disconnect();
   console.log('Test data cleanup complete');
 });
@@ -43,9 +44,9 @@ describe('SWIFT Codes API', () => {
 
   it('should return SWIFT code details for existing code', async () => {
     console.log('Testing details for existing SWIFT code...');
-    const res = await request(app).get('/v1/swift-codes/BPKOPLPWXXX');
+    const res = await request(app).get('/v1/swift-codes/PLTEST00XXX');
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('swiftCode', 'BPKOPLPWXXX');
+    expect(res.body).toHaveProperty('swiftCode', 'PLTEST00XXX');
     expect(res.body).toHaveProperty('isHeadquarter', true);
     expect(res.body).toHaveProperty('branches');
     console.log('Details test passed');
@@ -60,7 +61,7 @@ describe('SWIFT Codes API', () => {
     expect(res.body).toHaveProperty('swiftCodes');
     expect(Array.isArray(res.body.swiftCodes)).toBe(true);
     expect(res.body.swiftCodes.length).toBeGreaterThan(0);
-    expect(res.body.swiftCodes[0]).toHaveProperty('swiftCode', 'BPKOPLPWXXX');
+    expect(res.body.swiftCodes.some((code: any) => code.swiftCode === 'PLTEST00XXX')).toBe(true);
     console.log('Country codes test passed');
   });
 
@@ -70,11 +71,11 @@ describe('SWIFT Codes API', () => {
       .post('/v1/swift-codes')
       .send({
         address: 'UL. BRANCH 1, 00-000 WARSZAWA',
-        bankName: 'PKO BANK POLSKI',
+        bankName: 'TEST BANK POLAND',
         countryISO2: 'PL',
         countryName: 'POLAND',
         isHeadquarter: false,
-        swiftCode: 'BPKOPLPW001'
+        swiftCode: 'PLTEST00001'
       });
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('message', 'SWIFT code created successfully');
@@ -83,7 +84,7 @@ describe('SWIFT Codes API', () => {
 
   it('should delete a SWIFT code', async () => {
     console.log('Testing DELETE /v1/swift-codes/:swiftCode...');
-    const res = await request(app).delete('/v1/swift-codes/BPKOPLPW001');
+    const res = await request(app).delete('/v1/swift-codes/PLTEST00001');
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('message', 'SWIFT code deleted successfully');
     console.log('DELETE test passed');

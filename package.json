@@ -6,7 +6,7 @@
     "parse": "npx ts-node src/scripts/importExcel.ts",
     "dev": "nodemon src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "wait-port db:5432 && prisma migrate deploy && node dist/scripts/importExcel.js && node dist/server.js",
     "test": "jest"
   },
   "keywords": [],
